@@ -9,6 +9,7 @@ export async function GET(request: Request) {
     primaryCurrencyCode: 'INR',
     primaryCurrencySymbol: '₹',
     onboardingCompleted: true,
+    proMember: true,
     isProMember: true,
   });
 }

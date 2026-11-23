@@ -21,7 +21,8 @@ export async function POST(request: Request) {
       countryCode: countryCode,
       primaryCurrencyCode: currencyCode,
       primaryCurrencySymbol: currencySymbol,
-      onboardingCompleted: false,
+      onboardingCompleted: true,
+      proMember: true,
       isProMember: true,
       message: 'Account successfully registered with ISO 4217 currency precision.',
     });

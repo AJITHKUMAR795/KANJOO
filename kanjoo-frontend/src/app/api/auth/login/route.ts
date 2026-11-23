@@ -4,7 +4,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const email = body.email || 'ajithkumarelvin6@gmail.com';
-    const fullName = email.includes('ajith') ? 'AJITHKUMAR M' : 'Authorized User';
+    const fullName = email.toLowerCase().includes('ajith') ? 'AJITHKUMAR M' : 'Authorized Fintech User';
 
     const mockToken = 'kanjoo_jwt_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
 
@@ -17,6 +17,7 @@ export async function POST(request: Request) {
       primaryCurrencyCode: 'INR',
       primaryCurrencySymbol: '₹',
       onboardingCompleted: true,
+      proMember: true,
       isProMember: true,
       message: 'Authentication successful.',
     });

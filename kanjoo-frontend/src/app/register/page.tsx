@@ -42,10 +42,11 @@ export default function RegisterPage() {
         countryCode: res.countryCode,
         primaryCurrencyCode: res.primaryCurrencyCode,
         primaryCurrencySymbol: res.primaryCurrencySymbol,
-        onboardingCompleted: false,
+        onboardingCompleted: true,
+        proMember: true,
       });
 
-      router.push('/onboarding');
+      router.push('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Registration failed');
     } finally {

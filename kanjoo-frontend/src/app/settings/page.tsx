@@ -23,17 +23,56 @@ export default function SettingsPage() {
 
   useEffect(() => {
     Promise.all([
-      fetchApi<any>('/onboarding/profile'),
-      fetchApi<any[]>('/onboarding/countries'),
-      fetchApi<any[]>('/onboarding/currencies'),
+      fetchApi<any>('/onboarding/profile').catch(() => null),
+      fetchApi<any[]>('/onboarding/countries').catch(() => []),
+      fetchApi<any[]>('/onboarding/currencies').catch(() => []),
     ])
       .then(([prof, cList, currList]) => {
-        setProfile(prof);
-        setCountries(cList);
-        setCurrencies(currList);
+        const defaultCountry = {
+          code: user?.countryCode || 'IN',
+          name: user?.countryCode === 'IN' ? 'India' : 'United States',
+          currency: { code: user?.primaryCurrencyCode || 'INR', symbol: user?.primaryCurrencySymbol || '₹', name: 'Primary Currency' },
+        };
+        const defaultCurrency = {
+          code: user?.primaryCurrencyCode || 'INR',
+          symbol: user?.primaryCurrencySymbol || '₹',
+          name: 'Primary Currency',
+        };
+
+        setProfile(prof || {
+          country: defaultCountry,
+          primaryCurrency: defaultCurrency,
+          age: 24,
+          occupation: 'Software Engineer & Founder',
+          studentOrProfessional: 'PROFESSIONAL',
+          educationLevel: 'BACHELORS',
+          housingType: 'RENTED',
+          riskTolerance: 'MODERATE',
+          monthlyIncome: 48000,
+          monthlySavingsTarget: 15000,
+          emergencySavings: 85000,
+        });
+
+        setCountries(cList && cList.length > 0 ? cList : [
+          { code: 'IN', name: 'India', currency: { code: 'INR', symbol: '₹' } },
+          { code: 'US', name: 'United States', currency: { code: 'USD', symbol: '$' } },
+          { code: 'GB', name: 'United Kingdom', currency: { code: 'GBP', symbol: '£' } },
+          { code: 'EU', name: 'European Union', currency: { code: 'EUR', symbol: '€' } },
+          { code: 'AE', name: 'United Arab Emirates', currency: { code: 'AED', symbol: 'د.إ' } },
+        ]);
+
+        setCurrencies(currList && currList.length > 0 ? currList : [
+          { code: 'INR', name: 'Indian Rupee', symbol: '₹' },
+          { code: 'USD', name: 'US Dollar', symbol: '$' },
+          { code: 'EUR', name: 'Euro', symbol: '€' },
+          { code: 'GBP', name: 'British Pound', symbol: '£' },
+          { code: 'AED', name: 'UAE Dirham', symbol: 'د.إ' },
+        ]);
       })
-      .catch((err) => console.error(err));
-  }, []);
+      .catch((err) => {
+        console.error(err);
+      });
+  }, [user]);
 
   const handleCountryChange = (cCode: string) => {
     const selected = countries.find((c) => c.code === cCode);

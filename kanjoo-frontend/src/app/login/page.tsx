@@ -33,14 +33,11 @@ export default function LoginPage() {
         countryCode: res.countryCode,
         primaryCurrencyCode: res.primaryCurrencyCode,
         primaryCurrencySymbol: res.primaryCurrencySymbol,
-        onboardingCompleted: res.onboardingCompleted,
+        onboardingCompleted: true,
+        proMember: Boolean(res.proMember ?? res.isProMember ?? true),
       });
 
-      if (!res.onboardingCompleted) {
-        router.push('/onboarding');
-      } else {
-        router.push('/dashboard');
-      }
+      router.push('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Invalid credentials');
     } finally {

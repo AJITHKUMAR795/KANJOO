@@ -30,7 +30,7 @@ import {
 } from 'lucide-react';
 
 export default function ProPage() {
-  const { user, refreshUser } = useAuth();
+  const { user, refreshUser, updateUserContext } = useAuth();
   const [activeTab, setActiveTab] = useState<'membership' | 'stocks' | 'runway' | 'equity' | 'tax' | 'investors' | 'network' | 'legal' | 'cashflow'>('membership');
   const [loading, setLoading] = useState(true);
 
@@ -121,10 +121,11 @@ export default function ProPage() {
         }),
       });
       setSubscribeSuccess(true);
+      updateUserContext({ proMember: true });
       await refreshUser();
       setTimeout(() => {
         loadData();
-      }, 1000);
+      }, 500);
     } catch (err) {
       alert('Subscription activation failed');
     } finally {
@@ -173,7 +174,7 @@ export default function ProPage() {
   };
 
   const symbol = user?.primaryCurrencySymbol || '$';
-  const isPro = Boolean(user?.proMember);
+  const isPro = Boolean(user?.proMember || (user as any)?.isProMember || subscribeSuccess);
 
   return (
     <AppLayout>

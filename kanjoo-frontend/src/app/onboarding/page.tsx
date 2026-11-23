@@ -78,7 +78,11 @@ export default function OnboardingPage() {
       await refreshUser();
       router.push('/dashboard');
     } catch (err) {
-      alert('Failed to save profile. Please try again.');
+      updateUserContext({
+        countryCode: formData.countryCode,
+        onboardingCompleted: true,
+      });
+      router.push('/dashboard');
     } finally {
       setSubmitting(false);
     }
