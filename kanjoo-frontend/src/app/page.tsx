@@ -60,6 +60,15 @@ export default function LandingPage() {
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Services Provided Nav Button */}
+          <Link
+            href="/services"
+            className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-navy-800/80 border border-white/10 text-slate-300 hover:text-white text-xs font-semibold hover:border-brand-cyan/30 transition-all"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-brand-cyan" />
+            <span>Services (12)</span>
+          </Link>
+
           {/* AI Assistant Quick Pill */}
           <button
             onClick={() => setAiModalOpen(true)}
@@ -118,6 +127,14 @@ export default function LandingPage() {
             className="px-7 py-3.5 rounded-xl bg-gradient-to-r from-brand-cyan to-brand-blue text-navy-950 font-bold text-sm hover:opacity-95 shadow-xl shadow-brand-cyan/25 flex items-center justify-center gap-2"
           >
             Create Free Account <ArrowRight className="w-4 h-4" />
+          </Link>
+
+          <Link
+            href="/services"
+            className="px-6 py-3.5 rounded-xl bg-navy-800 hover:bg-navy-700/80 border border-white/20 text-white font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg"
+          >
+            <Sparkles className="w-4 h-4 text-brand-cyan" />
+            Explore All 12 Services
           </Link>
 
           <button

@@ -47,6 +47,7 @@ const NAV_SECTIONS: NavSection[] = [
     title: 'Overview',
     items: [
       { name: 'Executive Dashboard', href: '/dashboard', icon: LayoutDashboard },
+      { name: 'Services Provided', href: '/services', icon: Sparkles, badge: '12 Tier-1', badgeColor: 'bg-brand-cyan/20 text-brand-cyan border border-brand-cyan/30' },
       { name: 'Intelligence Score', href: '/intelligence-score', icon: Award, badge: '84/100', badgeColor: 'bg-emerald-500/20 text-emerald-300' },
       { name: 'Personal Net Worth', href: '/net-worth', icon: Wallet },
     ],
