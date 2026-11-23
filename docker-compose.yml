@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: kanjoo-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: kanjoo
+      POSTGRES_USER: kanjoo
+      POSTGRES_PASSWORD: kanjoo_secure_password_2026
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kanjoo -d kanjoo"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./kanjoo-backend
+      dockerfile: Dockerfile
+    container_name: kanjoo-backend
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: kanjoo
+      DB_USER: kanjoo
+      DB_PASSWORD: kanjoo_secure_password_2026
+      JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      ALLOWED_ORIGINS: http://localhost:3000,http://127.0.0.1:3000
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: ./kanjoo-frontend
+      dockerfile: Dockerfile
+    container_name: kanjoo-frontend
+    restart: always
+    depends_on:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8080/api
+    ports:
+      - "3000:3000"
+
+volumes:
+  pgdata:
