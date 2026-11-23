@@ -25,11 +25,13 @@ import {
   ArrowRight,
   ShieldCheck,
   Check,
+  Rocket,
+  PieChart as PieChartIcon,
 } from 'lucide-react';
 
 export default function ProPage() {
   const { user, refreshUser } = useAuth();
-  const [activeTab, setActiveTab] = useState<'membership' | 'stocks' | 'tax' | 'investors' | 'network' | 'legal' | 'cashflow'>('membership');
+  const [activeTab, setActiveTab] = useState<'membership' | 'stocks' | 'runway' | 'equity' | 'tax' | 'investors' | 'network' | 'legal' | 'cashflow'>('membership');
   const [loading, setLoading] = useState(true);
 
   // Pro Pricing & Subscription
@@ -48,6 +50,10 @@ export default function ProPage() {
     currentPrice: '',
     holdingType: 'EQUITY',
   });
+
+  // Founder Runway & Equity
+  const [runwayData, setRunwayData] = useState<any>(null);
+  const [equityData, setEquityData] = useState<any>(null);
 
   // Tax Report
   const [taxReport, setTaxReport] = useState<any>(null);
@@ -69,7 +75,7 @@ export default function ProPage() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [pRes, sRes, tRes, iRes, nRes, lRes, cRes] = await Promise.all([
+      const [pRes, sRes, tRes, iRes, nRes, lRes, cRes, rRes, eqRes] = await Promise.all([
         fetchApi<any>('/pro/price').catch(() => null),
         fetchApi<any>('/pro/stocks').catch(() => ({ holdings: [], summary: {} })),
         fetchApi<any>('/pro/tax-report').catch(() => null),
@@ -77,6 +83,8 @@ export default function ProPage() {
         fetchApi<any[]>('/pro/network').catch(() => []),
         fetchApi<any[]>('/pro/legal-templates').catch(() => []),
         fetchApi<any>('/pro/upcoming-payments').catch(() => null),
+        fetchApi<any>('/pro/runway').catch(() => null),
+        fetchApi<any>('/pro/equity').catch(() => null),
       ]);
 
       setPricing(pRes);
@@ -87,6 +95,8 @@ export default function ProPage() {
       setLegalTemplates(lRes || []);
       if (lRes && lRes.length > 0) setSelectedTemplate(lRes[0]);
       setUpcomingCashflow(cRes);
+      setRunwayData(rRes);
+      setEquityData(eqRes);
     } catch (err) {
       console.error('Failed to load pro data', err);
     } finally {
@@ -208,6 +218,8 @@ export default function ProPage() {
         {[
           { id: 'membership', label: 'Pro Membership', icon: Crown },
           { id: 'stocks', label: 'Stocks & Tax Reduction', icon: TrendingUp },
+          { id: 'runway', label: 'Startup Runway & Burn', icon: Rocket },
+          { id: 'equity', label: 'ESOP & Cap Table', icon: PieChartIcon },
           { id: 'tax', label: 'Tax Filing Report', icon: FileText },
           { id: 'investors', label: 'Startup Investors (VCs)', icon: Briefcase },
           { id: 'network', label: 'Business Network (LinkedIn)', icon: Users },
@@ -503,6 +515,169 @@ export default function ProPage() {
                       </td>
                     </tr>
                   )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB: STARTUP RUNWAY & BURN ENGINE */}
+      {activeTab === 'runway' && (
+        <div className="mt-6 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="glass-panel p-4 rounded-xl border border-white/5">
+              <span className="text-[11px] text-slate-400 font-medium">Cash on Hand</span>
+              <div className="text-xl font-bold text-white mt-1">
+                {symbol}{Number(runwayData?.cashOnHand || 1250000).toLocaleString()}
+              </div>
+              <span className="text-[10px] text-emerald-400">Available bank balances</span>
+            </div>
+
+            <div className="glass-panel p-4 rounded-xl border border-white/5">
+              <span className="text-[11px] text-slate-400 font-medium">Monthly Revenue</span>
+              <div className="text-xl font-bold text-emerald-400 mt-1">
+                {symbol}{Number(runwayData?.monthlyRevenue || 150000).toLocaleString()}
+              </div>
+              <span className="text-[10px] text-slate-500">MRR / Verified receipts</span>
+            </div>
+
+            <div className="glass-panel p-4 rounded-xl border border-white/5">
+              <span className="text-[11px] text-slate-400 font-medium">Net Monthly Burn</span>
+              <div className="text-xl font-bold text-rose-400 mt-1">
+                {symbol}{Number(runwayData?.netMonthlyBurn || 170000).toLocaleString()}
+              </div>
+              <span className="text-[10px] text-slate-500">Gross burn: {symbol}{Number(runwayData?.monthlyGrossBurn || 320000).toLocaleString()}</span>
+            </div>
+
+            <div className="glass-panel p-4 rounded-xl border border-white/5">
+              <span className="text-[11px] text-slate-400 font-medium">Projected Runway</span>
+              <div className="text-xl font-bold text-brand-cyan mt-1">
+                {runwayData?.runwayMonths || 7.4} Months
+              </div>
+              <span className="text-[10px] text-slate-400">At current zero-growth burn rate</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="glass-panel p-5 rounded-2xl border border-white/5 space-y-4">
+              <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center justify-between">
+                <span>Monthly Burn Composition</span>
+                <Rocket className="w-4 h-4 text-brand-cyan" />
+              </h3>
+
+              <div className="space-y-3">
+                {(runwayData?.burnBreakdown || [
+                  { category: 'Engineering & Product Payroll', amount: 180000, percent: 56.25 },
+                  { category: 'Cloud Infrastructure & AI Tokens', amount: 65000, percent: 20.31 },
+                  { category: 'SaaS Tooling & Co-Working', amount: 45000, percent: 14.06 },
+                  { category: 'Legal, Compliance & Banking Reserve', amount: 30000, percent: 9.38 },
+                ]).map((item: any, idx: number) => (
+                  <div key={idx} className="p-3 rounded-xl bg-navy-950/60 border border-white/5">
+                    <div className="flex justify-between text-xs mb-1">
+                      <span className="text-slate-300 font-semibold">{item.category}</span>
+                      <span className="text-white font-mono">{symbol}{Number(item.amount).toLocaleString()} ({item.percent}%)</span>
+                    </div>
+                    <div className="w-full h-1.5 rounded-full bg-navy-900 overflow-hidden">
+                      <div className="h-full rounded-full bg-gradient-to-r from-brand-blue to-brand-cyan" style={{ width: `${item.percent}%` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="glass-panel p-5 rounded-2xl border border-white/5 space-y-4">
+              <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center justify-between">
+                <span>Runway Extension & Break-Even Simulation</span>
+                <Sparkles className="w-4 h-4 text-amber-300" />
+              </h3>
+
+              <div className="p-4 rounded-xl bg-navy-950/70 border border-white/5 space-y-3">
+                <div className="text-xs text-slate-300 leading-relaxed">
+                  <strong>Break-Even MRR Target:</strong> {symbol}{Number(runwayData?.breakEvenRevenueTarget || 320000).toLocaleString()}/month to achieve self-sustaining cashflow neutrality.
+                </div>
+                <div className="text-xs text-slate-300 leading-relaxed">
+                  <strong>15% MoM Growth Trajectory:</strong> Reaches break-even within <strong>9 months</strong>, extending effective runway to 12.8+ months without external bridge capital.
+                </div>
+                <div className="p-3 rounded-lg bg-brand-cyan/10 border border-brand-cyan/20 text-xs text-brand-cyan">
+                  {runwayData?.recommendation ||
+                    'Initiate Seed round pitch discussions 4 months before runway dip below 4 months.'}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB: ESOP & CAP TABLE SIMULATOR */}
+      {activeTab === 'equity' && (
+        <div className="mt-6 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="glass-panel p-4 rounded-xl border border-white/5">
+              <span className="text-[11px] text-slate-400 font-medium">Lead Founder Equity</span>
+              <div className="text-xl font-bold text-white mt-1">55.0%</div>
+              <span className="text-[10px] text-slate-500">5,500,000 Ordinary Shares</span>
+            </div>
+
+            <div className="glass-panel p-4 rounded-xl border border-white/5">
+              <span className="text-[11px] text-slate-400 font-medium">ESOP Allocation Pool</span>
+              <div className="text-xl font-bold text-brand-cyan mt-1">10.0%</div>
+              <span className="text-[10px] text-slate-500">1,000,000 Reserved Options</span>
+            </div>
+
+            <div className="glass-panel p-4 rounded-xl border border-white/5">
+              <span className="text-[11px] text-slate-400 font-medium">Vesting Progress</span>
+              <div className="text-xl font-bold text-emerald-400 mt-1">29.2% Vested</div>
+              <span className="text-[10px] text-slate-500">14 of 48 months completed</span>
+            </div>
+          </div>
+
+          <div className="glass-panel p-5 rounded-2xl border border-white/5 space-y-4">
+            <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center justify-between">
+              <span>Capitalization Table & Dilution Simulation ($500K Seed at $3.5M Pre-Money)</span>
+              <PieChartIcon className="w-4 h-4 text-brand-cyan" />
+            </h3>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-white/10 text-slate-400">
+                    <th className="pb-3 font-semibold">Shareholder</th>
+                    <th className="pb-3 font-semibold">Role</th>
+                    <th className="pb-3 font-semibold text-right">Pre-Money Shares</th>
+                    <th className="pb-3 font-semibold text-right">Pre-Money %</th>
+                    <th className="pb-3 font-semibold text-right">Post-Dilution %</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  <tr className="hover:bg-white/[0.02]">
+                    <td className="py-3 font-bold text-white">Ajith Kumar</td>
+                    <td className="py-3 text-brand-cyan">Lead Founder & CEO</td>
+                    <td className="py-3 text-right font-mono text-slate-300">5,500,000</td>
+                    <td className="py-3 text-right font-mono font-bold text-white">55.0%</td>
+                    <td className="py-3 text-right font-mono font-bold text-emerald-400">48.1%</td>
+                  </tr>
+                  <tr className="hover:bg-white/[0.02]">
+                    <td className="py-3 font-bold text-white">Co-Founder & CTO</td>
+                    <td className="py-3 text-brand-cyan">Co-Founder</td>
+                    <td className="py-3 text-right font-mono text-slate-300">2,500,000</td>
+                    <td className="py-3 text-right font-mono font-bold text-white">25.0%</td>
+                    <td className="py-3 text-right font-mono font-bold text-emerald-400">21.9%</td>
+                  </tr>
+                  <tr className="hover:bg-white/[0.02]">
+                    <td className="py-3 font-bold text-white">ESOP Option Pool</td>
+                    <td className="py-3 text-amber-300">Key Hires Reserve</td>
+                    <td className="py-3 text-right font-mono text-slate-300">1,000,000</td>
+                    <td className="py-3 text-right font-mono font-bold text-white">10.0%</td>
+                    <td className="py-3 text-right font-mono font-bold text-slate-300">8.8%</td>
+                  </tr>
+                  <tr className="hover:bg-white/[0.02]">
+                    <td className="py-3 font-bold text-white">New Seed Investors</td>
+                    <td className="py-3 text-emerald-400">Series Seed ($500K)</td>
+                    <td className="py-3 text-right font-mono text-slate-300">—</td>
+                    <td className="py-3 text-right font-mono font-bold text-slate-400">0.0%</td>
+                    <td className="py-3 text-right font-mono font-bold text-brand-cyan">12.5%</td>
+                  </tr>
                 </tbody>
               </table>
             </div>

@@ -265,6 +265,33 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* KANJOO 2.0 Institutional Cockpit Grid */}
+      <div className="mt-8">
+        <h2 className="text-sm font-bold text-white mb-3">Institutional Intelligence Cockpit</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+          <Link href="/cashflow-forecast" className="p-4 rounded-xl glass-panel hover:border-brand-cyan/30 transition-all flex flex-col justify-between">
+            <span className="text-[10px] font-bold text-brand-cyan uppercase">Forecasting</span>
+            <span className="font-bold text-white mt-1">Predictive Cash Flow</span>
+            <span className="text-[10px] text-slate-400 mt-1">7, 30, 60, 90-day balance burn simulator</span>
+          </Link>
+          <Link href="/net-worth" className="p-4 rounded-xl glass-panel hover:border-brand-cyan/30 transition-all flex flex-col justify-between">
+            <span className="text-[10px] font-bold text-emerald-400 uppercase">Balance Sheet</span>
+            <span className="font-bold text-white mt-1">Net Worth Tracker</span>
+            <span className="text-[10px] text-slate-400 mt-1">Liquid assets, equity & debt balance</span>
+          </Link>
+          <Link href="/statements" className="p-4 rounded-xl glass-panel hover:border-brand-cyan/30 transition-all flex flex-col justify-between">
+            <span className="text-[10px] font-bold text-indigo-400 uppercase">Automated Ingestion</span>
+            <span className="font-bold text-white mt-1">Bank Statement Importer</span>
+            <span className="text-[10px] text-slate-400 mt-1">CSV, XLSX & PDF parser with auto-tagging</span>
+          </Link>
+          <Link href="/anomalies" className="p-4 rounded-xl glass-panel hover:border-brand-cyan/30 transition-all flex flex-col justify-between">
+            <span className="text-[10px] font-bold text-rose-400 uppercase">Surveillance</span>
+            <span className="font-bold text-white mt-1">Anomaly Detection</span>
+            <span className="text-[10px] text-slate-400 mt-1">Duplicate charges & unexpected hikes</span>
+          </Link>
+        </div>
+      </div>
+
       {/* Recent Transactions Table */}
       <div className="mt-8 p-6 rounded-2xl glass-panel">
         <div className="flex items-center justify-between mb-4">
