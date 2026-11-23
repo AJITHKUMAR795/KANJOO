@@ -282,30 +282,68 @@ export default function ProPage() {
                 </div>
               </div>
 
-              {/* PayPal Payment Section */}
-              <div className="mt-6 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="text-xs text-slate-400">
-                  <span className="flex items-center gap-1.5 text-white font-semibold">
-                    <ShieldCheck className="w-4 h-4 text-brand-cyan" /> Secure PayPal Express Billing
-                  </span>
-                  <span>Recipient Account: <strong>{pricing?.paypalEmail || 'billing@kanjoo.ai'}</strong></span>
+              {/* PayPal Payment & QR Code Section */}
+              <div className="mt-6 pt-6 border-t border-white/10 space-y-4">
+                <div className="p-5 rounded-2xl bg-navy-900/90 border border-brand-cyan/20 flex flex-col md:flex-row items-center justify-between gap-6">
+                  <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
+                    <div className="relative p-2.5 rounded-2xl bg-white shadow-2xl flex-shrink-0">
+                      <img
+                        src="/paypal-qr.jpg"
+                        alt="AJITHKUMAR M PayPal QR Code"
+                        className="w-36 h-36 rounded-xl object-contain"
+                      />
+                      <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-[#0070BA] text-white text-[9px] font-extrabold tracking-wider shadow">
+                        PAYPAL QR
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-center sm:justify-start gap-1.5 text-brand-cyan text-xs font-bold uppercase tracking-wider mb-1">
+                        <Sparkles className="w-3.5 h-3.5" />
+                        <span>Direct Scan & Pay with PayPal</span>
+                      </div>
+                      <h4 className="text-base font-bold text-white">Recipient: AJITHKUMAR M</h4>
+                      <p className="text-xs text-slate-300 mt-1 max-w-sm">
+                        Scan this official PayPal QR code with your mobile camera or PayPal app to transfer <strong>$1.00 USD</strong> (or your local equivalent <strong>{pricing?.formatted || '$1.00'}</strong>).
+                      </p>
+                      <span className="inline-block mt-2 text-[11px] text-emerald-400 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                        Instant Auto-Activation Enabled
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col items-center sm:items-end gap-2 w-full md:w-auto">
+                    {isPro ? (
+                      <div className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold">
+                        <CheckCircle2 className="w-4 h-4" /> PRO Subscription Active
+                      </div>
+                    ) : (
+                      <button
+                        disabled={subscribing}
+                        onClick={handleSubscribe}
+                        className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-brand-cyan text-navy-950 font-extrabold text-xs shadow-lg hover:shadow-brand-cyan/25 transition-all"
+                      >
+                        <Crown className="w-4 h-4" />
+                        {subscribing ? 'Activating Membership...' : `I've Scanned & Paid — Activate PRO`}
+                      </button>
+                    )}
+                  </div>
                 </div>
 
-                {isPro ? (
-                  <div className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold">
-                    <CheckCircle2 className="w-4 h-4" />
-                    Subscription Active (Full Access Unlocked)
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 text-xs text-slate-400">
+                  <div className="flex items-center gap-1.5">
+                    <ShieldCheck className="w-4 h-4 text-brand-cyan" />
+                    <span>Account Recipient: <strong>AJITHKUMAR M (billing@kanjoo.ai)</strong></span>
                   </div>
-                ) : (
-                  <button
-                    disabled={subscribing}
-                    onClick={handleSubscribe}
-                    className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-xl bg-[#0070BA] hover:bg-[#005ea6] text-white font-bold text-xs shadow-lg transition-all"
-                  >
-                    <span className="font-extrabold italic text-sm">PayPal</span>
-                    {subscribing ? 'Processing Transaction...' : `Pay & Activate PRO (${pricing?.formatted || '$1.00'}/mo)`}
-                  </button>
-                )}
+                  {!isPro && (
+                    <button
+                      disabled={subscribing}
+                      onClick={handleSubscribe}
+                      className="text-xs text-brand-cyan hover:underline font-semibold"
+                    >
+                      Or 1-Click Instant Express Activation →
+                    </button>
+                  )}
+                </div>
               </div>
 
               {subscribeSuccess && (
