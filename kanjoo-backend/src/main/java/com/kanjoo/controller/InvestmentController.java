@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -17,15 +19,21 @@ public class InvestmentController {
     private final InvestmentRepository investmentRepository;
     private final CurrencyRepository currencyRepository;
     private final UserProfileRepository userProfileRepository;
+    private final ExpenseRepository expenseRepository;
+    private final InsurancePolicyRepository insurancePolicyRepository;
     private final InvestmentEngine investmentEngine;
 
     public InvestmentController(InvestmentRepository investmentRepository,
                                 CurrencyRepository currencyRepository,
                                 UserProfileRepository userProfileRepository,
+                                ExpenseRepository expenseRepository,
+                                InsurancePolicyRepository insurancePolicyRepository,
                                 InvestmentEngine investmentEngine) {
         this.investmentRepository = investmentRepository;
         this.currencyRepository = currencyRepository;
         this.userProfileRepository = userProfileRepository;
+        this.expenseRepository = expenseRepository;
+        this.insurancePolicyRepository = insurancePolicyRepository;
         this.investmentEngine = investmentEngine;
     }
 
@@ -33,6 +41,22 @@ public class InvestmentController {
     public ResponseEntity<List<Investment>> getInvestments(@AuthenticationPrincipal User user) {
         if (user == null) return ResponseEntity.status(401).build();
         return ResponseEntity.ok(investmentRepository.findByUserIdOrderByCreatedAtDesc(user.getId()));
+    }
+
+    @GetMapping("/eligibility")
+    public ResponseEntity<?> getEligibility(@AuthenticationPrincipal User user) {
+        if (user == null) return ResponseEntity.status(401).build();
+        UserProfile profile = userProfileRepository.findByUser(user).orElse(null);
+        LocalDate startOfMonth = LocalDate.now().withDayOfMonth(1);
+        List<Expense> expenses = expenseRepository.findByUserIdAndDateRange(user.getId(), startOfMonth, LocalDate.now());
+        BigDecimal monthExpenses = expenses.stream()
+            .map(Expense::getPrimaryAmount)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        boolean hasHealth = insurancePolicyRepository.findByUserIdAndActiveTrue(user.getId()).stream()
+            .anyMatch(p -> "HEALTH".equalsIgnoreCase(p.getPolicyType()));
+
+        return ResponseEntity.ok(investmentEngine.evaluateInvestmentEligibility(profile, monthExpenses, hasHealth));
     }
 
     @PostMapping

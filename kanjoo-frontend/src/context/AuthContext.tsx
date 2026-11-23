@@ -11,6 +11,7 @@ export interface UserInfo {
   primaryCurrencyCode: string;
   primaryCurrencySymbol: string;
   onboardingCompleted: boolean;
+  proMember?: boolean;
 }
 
 interface AuthContextType {

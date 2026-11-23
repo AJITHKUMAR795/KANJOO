@@ -31,6 +31,8 @@ public class AiService {
     private final SubscriptionIntelligenceEngine subscriptionEngine;
     private final CurrencyService currencyService;
     private final AiConversationRepository aiConversationRepository;
+    private final InsuranceService insuranceService;
+    private final ProService proService;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -40,7 +42,9 @@ public class AiService {
                      RechargeOptimizationEngine rechargeEngine,
                      SubscriptionIntelligenceEngine subscriptionEngine,
                      CurrencyService currencyService,
-                     AiConversationRepository aiConversationRepository) {
+                     AiConversationRepository aiConversationRepository,
+                     InsuranceService insuranceService,
+                     ProService proService) {
         this.userProfileRepository = userProfileRepository;
         this.expenseRepository = expenseRepository;
         this.leakEngine = leakEngine;
@@ -48,6 +52,8 @@ public class AiService {
         this.subscriptionEngine = subscriptionEngine;
         this.currencyService = currencyService;
         this.aiConversationRepository = aiConversationRepository;
+        this.insuranceService = insuranceService;
+        this.proService = proService;
     }
 
     public record ChatResponse(
@@ -120,12 +126,13 @@ public class AiService {
         }
 
         // High-intelligence deterministic response engine
-        ChatResponse response = generateDeterministicAdvice(userQuery, profile, currency, totalIncome, currentMonthExpenses, leakReport, simResults, subEvals);
+        ChatResponse response = generateDeterministicAdvice(user, userQuery, profile, currency, totalIncome, currentMonthExpenses, leakReport, simResults, subEvals);
         saveAssistantMessage(user, response.reply(), verifiedContext);
         return response;
     }
 
-    private ChatResponse generateDeterministicAdvice(String query,
+    private ChatResponse generateDeterministicAdvice(User user,
+                                                     String query,
                                                      UserProfile profile,
                                                      Currency currency,
                                                      BigDecimal totalIncome,
@@ -134,6 +141,58 @@ public class AiService {
                                                      List<RechargeOptimizationEngine.SimOptimizationResult> simResults,
                                                      List<SubscriptionIntelligenceEngine.SubscriptionEvaluation> subEvals) {
         String q = query.toLowerCase();
+
+        // 0. Upcoming Payments & Cashflow Pro Planner Query
+        if (q.contains("upcoming") || q.contains("payment") || q.contains("due") || q.contains("bill") || q.contains("renewal")) {
+            var plan = proService.getUpcomingPaymentsPlan(user);
+            StringBuilder sb = new StringBuilder();
+            sb.append("Here is your **Upcoming Payments & Cashflow Schedule** for the next 30 days:\n\n");
+            if (plan.payments().isEmpty()) {
+                sb.append("No immediate payments due in the next 30 days! Your recurring obligations are up to date.\n\n");
+            } else {
+                for (var p : plan.payments()) {
+                    sb.append(String.format("- **%s** (%s): **%s** due on `%s` (%d days remaining) [%s]\n",
+                        p.title(), p.category(), currencyService.format(p.amount(), currency), p.dueDate(), p.daysRemaining(), p.status()));
+                }
+                sb.append("\n**Total Due:** ").append(currencyService.format(plan.upcomingPaymentsTotal(), currency)).append("\n");
+                sb.append("**Projected Remaining Surplus:** ").append(currencyService.format(plan.projectedEndMonthSurplus(), currency)).append("\n\n");
+                sb.append("*Advisor Insight:* ").append(plan.proactiveAiAdvice());
+            }
+
+            return new ChatResponse(
+                sb.toString(),
+                "View Pro Cashflow",
+                "/pro/cashflow",
+                List.of("Can I reduce my upcoming bills?", "Am I eligible to invest?", "Check my insurance safety net")
+            );
+        }
+
+        // 0.1 Insurance & Safety Net Query
+        if (q.contains("insurance") || q.contains("health cover") || q.contains("term life") || q.contains("policy")) {
+            var rep = insuranceService.getAdequacyReport(user);
+            StringBuilder sb = new StringBuilder();
+            sb.append("Here is your **Insurance Adequacy & Safety Net Analysis**:\n\n");
+            sb.append("- **Health Coverage:** ").append(currencyService.format(rep.totalHealthCoverage(), currency))
+              .append(" (Recommended benchmark: ").append(currencyService.format(rep.recommendedHealthCoverage(), currency)).append(")\n");
+            sb.append("- **Life Coverage:** ").append(currencyService.format(rep.totalLifeCoverage(), currency))
+              .append(" (Recommended benchmark: ").append(currencyService.format(rep.recommendedLifeCoverage(), currency)).append(")\n");
+            sb.append("- **Total Annual Premium:** ").append(currencyService.format(rep.totalAnnualPremium(), currency)).append("\n");
+            sb.append("- **Estimated Tax Savings (80D/80C):** ").append(currencyService.format(rep.estimatedTaxSavings(), currency)).append("\n\n");
+
+            if (!rep.criticalGaps().isEmpty()) {
+                sb.append("**Actionable Gaps Identified:**\n");
+                for (String g : rep.criticalGaps()) {
+                    sb.append("- ").append(g).append("\n");
+                }
+            }
+
+            return new ChatResponse(
+                sb.toString(),
+                "Review Insurance Gaps",
+                "/insurance",
+                List.of("Recommend me a health policy", "What payments are upcoming?", "How much can I invest?")
+            );
+        }
 
         // 1. Telecom & SIM query
         if (q.contains("recharge") || q.contains("sim") || q.contains("telecom") || q.contains("mobile")) {

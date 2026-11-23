@@ -17,10 +17,14 @@ import {
   Compass,
   BarChart3,
   Settings,
+  ShieldCheck,
+  Crown,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'KANJOO PRO Hub', href: '/pro', icon: Crown, highlightPro: true, badge: 'PRO' },
+  { name: 'Insurance & Protection', href: '/insurance', icon: ShieldCheck, badge: 'Essential' },
   { name: 'My Expenses', href: '/expenses', icon: Receipt },
   { name: 'Recharge Optimizer', href: '/recharge-optimizer', icon: Smartphone, badge: 'Smart' },
   { name: 'Offers & Subscriptions', href: '/subscriptions', icon: Sparkles },
@@ -56,18 +60,22 @@ export default function Sidebar() {
               className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all ${
                 isActive
                   ? 'bg-gradient-to-r from-brand-cyan/20 to-brand-blue/10 text-brand-cyan border border-brand-cyan/30 shadow-sm'
+                  : (item as any).highlightPro
+                  ? 'bg-gradient-to-r from-amber-500/15 via-purple-500/10 to-brand-blue/15 text-amber-300 border border-amber-500/30 hover:border-amber-400/50'
                   : item.highlight
                   ? 'bg-brand-indigo/15 text-indigo-300 border border-brand-indigo/25 hover:bg-brand-indigo/25'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-navy-800/60'
               }`}
             >
               <div className="flex items-center gap-3">
-                <Icon className={`w-4 h-4 ${isActive ? 'text-brand-cyan' : item.highlight ? 'text-indigo-400' : 'text-slate-400'}`} />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-brand-cyan' : (item as any).highlightPro ? 'text-amber-400' : item.highlight ? 'text-indigo-400' : 'text-slate-400'}`} />
                 <span>{item.name}</span>
               </div>
               {item.badge && (
                 <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider ${
-                  item.badge === 'Signature'
+                  item.badge === 'PRO'
+                    ? 'bg-gradient-to-r from-amber-400 to-amber-600 text-black font-extrabold shadow-sm shadow-amber-500/20'
+                    : item.badge === 'Signature'
                     ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
                     : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                 }`}>

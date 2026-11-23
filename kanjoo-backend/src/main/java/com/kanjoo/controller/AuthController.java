@@ -67,7 +67,8 @@ public class AuthController {
             country.getCode(),
             country.getCurrency().getCode(),
             country.getCurrency().getSymbol(),
-            false
+            false,
+            user.isProMember()
         ));
     }
 
@@ -96,7 +97,8 @@ public class AuthController {
             countryCode,
             currCode,
             currSym,
-            onboardingDone
+            onboardingDone,
+            user.isProMember()
         ));
     }
 
@@ -119,7 +121,8 @@ public class AuthController {
             countryCode,
             currCode,
             currSym,
-            onboardingDone
+            onboardingDone,
+            user.isProMember()
         ));
     }
 }

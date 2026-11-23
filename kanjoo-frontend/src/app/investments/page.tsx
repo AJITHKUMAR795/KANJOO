@@ -18,6 +18,7 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'rec
 export default function InvestmentsPage() {
   const { user } = useAuth();
   const [investments, setInvestments] = useState<any[]>([]);
+  const [eligibility, setEligibility] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   // SIP Calculator state
@@ -28,8 +29,12 @@ export default function InvestmentsPage() {
 
   const loadData = async () => {
     try {
-      const data = await fetchApi<any[]>('/investments');
-      setInvestments(data);
+      const [invData, eligData] = await Promise.all([
+        fetchApi<any[]>('/investments').catch(() => []),
+        fetchApi<any>('/investments/eligibility').catch(() => null),
+      ]);
+      setInvestments(invData || []);
+      setEligibility(eligData);
       calculateSip(sipMonthly, sipReturn, sipYears);
     } catch (err) {
       console.error(err);
@@ -86,6 +91,93 @@ export default function InvestmentsPage() {
           </p>
         </div>
       </div>
+
+      {/* Smart Investment Eligibility Engine Card */}
+      {eligibility && (
+        <div className="mt-6 p-6 rounded-2xl glass-panel border border-brand-cyan/20 relative overflow-hidden">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between pb-4 border-b border-white/10 gap-4">
+            <div className="flex items-center gap-3">
+              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-lg shadow-lg ${
+                eligibility.isEligible ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
+              }`}>
+                {eligibility.readinessScore}%
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-base font-bold text-white">Smart Investment Eligibility Engine</h2>
+                  {eligibility.isEligible ? (
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-extrabold flex items-center gap-1">
+                      <ShieldCheck className="w-3 h-3" /> FULLY ELIGIBLE TO INVEST
+                    </span>
+                  ) : (
+                    <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-extrabold flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" /> ACTION REQUIRED BEFORE INVESTING
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-slate-400 mt-0.5">{eligibility.guidanceNote}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 text-xs font-mono self-end lg:self-auto">
+              <div className="text-right">
+                <span className="text-[10px] text-slate-400 block font-sans">Suggested Monthly SIP</span>
+                <span className="text-base font-extrabold text-brand-cyan">
+                  {symbol} {Number(eligibility.suggestedSipMonthly || 0).toLocaleString()}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Checklist Criteria & Asset Allocation */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-2">
+            {/* Checklist */}
+            <div className="space-y-2.5">
+              <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider block">Financial Foundation Checklist</span>
+              <div className={`p-3 rounded-xl border flex items-center justify-between text-xs ${
+                eligibility.emergencyFundReady ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-300' : 'bg-rose-500/5 border-rose-500/20 text-rose-300'
+              }`}>
+                <span>Emergency Fund Cushion (Min 3-6 Months)</span>
+                <span className="font-bold font-mono">{eligibility.emergencyBufferMonths.toFixed(1)} Months</span>
+              </div>
+              <div className={`p-3 rounded-xl border flex items-center justify-between text-xs ${
+                eligibility.positiveSurplus ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-300' : 'bg-rose-500/5 border-rose-500/20 text-rose-300'
+              }`}>
+                <span>Monthly Cashflow Surplus</span>
+                <span className="font-bold font-mono">{symbol} {Number(eligibility.monthlySurplus).toLocaleString()}</span>
+              </div>
+              <div className={`p-3 rounded-xl border flex items-center justify-between text-xs ${
+                eligibility.insuranceProtected ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-300' : 'bg-amber-500/5 border-amber-500/20 text-amber-300'
+              }`}>
+                <span>Insurance Protection Baseline</span>
+                <span className="font-bold">{eligibility.insuranceProtected ? 'Protected' : 'Adequacy Review Advised'}</span>
+              </div>
+            </div>
+
+            {/* Asset Allocation */}
+            <div className="p-4 rounded-xl bg-navy-900 border border-white/5 flex flex-col justify-between">
+              <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider block mb-2">Age-Tailored Asset Allocation ({eligibility.allocationAdvice})</span>
+              <div className="grid grid-cols-3 gap-2 text-center">
+                <div className="p-2.5 rounded-lg bg-navy-950 border border-brand-cyan/20">
+                  <span className="text-[10px] text-slate-400 block">Equity / Index</span>
+                  <span className="text-base font-extrabold text-brand-cyan font-mono">{eligibility.recommendedEquityPercent}%</span>
+                </div>
+                <div className="p-2.5 rounded-lg bg-navy-950 border border-indigo-400/20">
+                  <span className="text-[10px] text-slate-400 block">Debt / Bonds</span>
+                  <span className="text-base font-extrabold text-indigo-300 font-mono">{eligibility.recommendedDebtPercent}%</span>
+                </div>
+                <div className="p-2.5 rounded-lg bg-navy-950 border border-amber-400/20">
+                  <span className="text-[10px] text-slate-400 block">Gold / SGB</span>
+                  <span className="text-base font-extrabold text-amber-300 font-mono">{eligibility.recommendedGoldPercent}%</span>
+                </div>
+              </div>
+              <span className="text-[10px] text-slate-500 mt-2 block">
+                Rule of Thumb: 100 minus age for equity exposure, dynamically customized to your risk tolerance.
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Portfolio Overview & SIP Calculator */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">

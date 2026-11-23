@@ -153,8 +153,12 @@ export default function BudgetPlannerPage() {
                       <span className="text-slate-400">Cap:</span>
                       <input
                         type="number"
-                        value={currentAlloc}
-                        onChange={(e) => handleAllocationChange(cat.categoryId, parseFloat(e.target.value) || 0)}
+                        placeholder="0"
+                        value={currentAlloc === 0 ? '' : currentAlloc}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/^0+(?=\d)/, '');
+                          handleAllocationChange(cat.categoryId, val === '' ? 0 : parseFloat(val) || 0);
+                        }}
                         className="w-24 px-2 py-1 rounded-lg bg-navy-950 border border-white/10 text-brand-cyan text-xs font-bold text-right font-mono"
                       />
                     </div>

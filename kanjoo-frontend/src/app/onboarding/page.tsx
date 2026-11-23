@@ -219,8 +219,12 @@ export default function OnboardingPage() {
                 <label className="block text-xs font-semibold text-slate-300 mb-1">Monthly Primary Income ({currencySymbol})</label>
                 <input
                   type="number"
-                  value={formData.monthlyIncome}
-                  onChange={(e) => handleChange('monthlyIncome', parseFloat(e.target.value) || 0)}
+                  placeholder="0"
+                  value={formData.monthlyIncome === 0 ? '' : formData.monthlyIncome}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/^0+(?=\d)/, '');
+                    handleChange('monthlyIncome', val === '' ? 0 : parseFloat(val) || 0);
+                  }}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-navy-900 border border-white/10 text-white text-xs font-mono"
                 />
               </div>
@@ -229,8 +233,12 @@ export default function OnboardingPage() {
                 <label className="block text-xs font-semibold text-slate-300 mb-1">Side Gig / Other Income ({currencySymbol})</label>
                 <input
                   type="number"
-                  value={formData.otherIncome}
-                  onChange={(e) => handleChange('otherIncome', parseFloat(e.target.value) || 0)}
+                  placeholder="0"
+                  value={formData.otherIncome === 0 ? '' : formData.otherIncome}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/^0+(?=\d)/, '');
+                    handleChange('otherIncome', val === '' ? 0 : parseFloat(val) || 0);
+                  }}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-navy-900 border border-white/10 text-white text-xs font-mono"
                 />
               </div>
@@ -239,8 +247,12 @@ export default function OnboardingPage() {
                 <label className="block text-xs font-semibold text-slate-300 mb-1">Monthly Savings Target ({currencySymbol})</label>
                 <input
                   type="number"
-                  value={formData.monthlySavingsTarget}
-                  onChange={(e) => handleChange('monthlySavingsTarget', parseFloat(e.target.value) || 0)}
+                  placeholder="0"
+                  value={formData.monthlySavingsTarget === 0 ? '' : formData.monthlySavingsTarget}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/^0+(?=\d)/, '');
+                    handleChange('monthlySavingsTarget', val === '' ? 0 : parseFloat(val) || 0);
+                  }}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-navy-900 border border-white/10 text-white text-xs font-mono"
                 />
               </div>
@@ -249,8 +261,12 @@ export default function OnboardingPage() {
                 <label className="block text-xs font-semibold text-slate-300 mb-1">Emergency Reserve Savings ({currencySymbol})</label>
                 <input
                   type="number"
-                  value={formData.emergencySavings}
-                  onChange={(e) => handleChange('emergencySavings', parseFloat(e.target.value) || 0)}
+                  placeholder="0"
+                  value={formData.emergencySavings === 0 ? '' : formData.emergencySavings}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/^0+(?=\d)/, '');
+                    handleChange('emergencySavings', val === '' ? 0 : parseFloat(val) || 0);
+                  }}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-navy-900 border border-white/10 text-white text-xs font-mono"
                 />
               </div>
@@ -259,8 +275,12 @@ export default function OnboardingPage() {
                 <label className="block text-xs font-semibold text-slate-300 mb-1">Existing Investments (Stocks / Funds / SIP) ({currencySymbol})</label>
                 <input
                   type="number"
-                  value={formData.existingInvestments}
-                  onChange={(e) => handleChange('existingInvestments', parseFloat(e.target.value) || 0)}
+                  placeholder="0"
+                  value={formData.existingInvestments === 0 ? '' : formData.existingInvestments}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/^0+(?=\d)/, '');
+                    handleChange('existingInvestments', val === '' ? 0 : parseFloat(val) || 0);
+                  }}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-navy-900 border border-white/10 text-white text-xs font-mono"
                 />
               </div>

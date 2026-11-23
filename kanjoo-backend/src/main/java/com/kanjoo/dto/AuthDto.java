@@ -27,7 +27,8 @@ public class AuthDto {
         String countryCode,
         String primaryCurrencyCode,
         String primaryCurrencySymbol,
-        boolean onboardingCompleted
+        boolean onboardingCompleted,
+        boolean proMember
     ) {}
 
     public record OnboardingRequest(

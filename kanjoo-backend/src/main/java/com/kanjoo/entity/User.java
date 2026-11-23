@@ -28,6 +28,15 @@ public class User {
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
 
+    @Column(name = "is_pro_member")
+    private boolean proMember = false;
+
+    @Column(name = "pro_expires_at")
+    private LocalDateTime proExpiresAt;
+
+    @Column(name = "paypal_subscription_id", length = 100)
+    private String paypalSubscriptionId;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -63,6 +72,15 @@ public class User {
 
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
+
+    public boolean isProMember() { return proMember; }
+    public void setProMember(boolean proMember) { this.proMember = proMember; }
+
+    public LocalDateTime getProExpiresAt() { return proExpiresAt; }
+    public void setProExpiresAt(LocalDateTime proExpiresAt) { this.proExpiresAt = proExpiresAt; }
+
+    public String getPaypalSubscriptionId() { return paypalSubscriptionId; }
+    public void setPaypalSubscriptionId(String paypalSubscriptionId) { this.paypalSubscriptionId = paypalSubscriptionId; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
