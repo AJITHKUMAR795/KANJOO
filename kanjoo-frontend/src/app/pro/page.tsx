@@ -289,7 +289,7 @@ export default function ProPage() {
                     <div className="relative p-2.5 rounded-2xl bg-white shadow-2xl flex-shrink-0">
                       <img
                         src="/paypal-qr.jpg"
-                        alt="AJITHKUMAR M PayPal QR Code"
+                        alt="Official PayPal QR Code"
                         className="w-36 h-36 rounded-xl object-contain"
                       />
                       <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-[#0070BA] text-white text-[9px] font-extrabold tracking-wider shadow">
@@ -301,7 +301,7 @@ export default function ProPage() {
                         <Sparkles className="w-3.5 h-3.5" />
                         <span>Direct Scan & Pay with PayPal</span>
                       </div>
-                      <h4 className="text-base font-bold text-white">Recipient: AJITHKUMAR M</h4>
+                      <h4 className="text-base font-bold text-white">KANJOO Official PayPal Merchant</h4>
                       <p className="text-xs text-slate-300 mt-1 max-w-sm">
                         Scan this official PayPal QR code with your mobile camera or PayPal app to transfer <strong>$1.00 USD</strong> (or your local equivalent <strong>{pricing?.formatted || '$1.00'}</strong>).
                       </p>
@@ -332,7 +332,7 @@ export default function ProPage() {
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 text-xs text-slate-400">
                   <div className="flex items-center gap-1.5">
                     <ShieldCheck className="w-4 h-4 text-brand-cyan" />
-                    <span>Account Recipient: <strong>AJITHKUMAR M (billing@kanjoo.ai)</strong></span>
+                    <span>Account Recipient: <strong>KANJOO Billing (billing@kanjoo.ai)</strong></span>
                   </div>
                   {!isPro && (
                     <button
