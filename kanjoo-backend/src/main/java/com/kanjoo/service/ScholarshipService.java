@@ -35,12 +35,19 @@ public class ScholarshipService {
 
     public List<ScholarshipCardDto> getScholarshipsForUser(Long userId) {
         Optional<UserProfile> profileOpt = userProfileRepository.findByUserId(userId);
-        if (profileOpt.isEmpty()) return List.of();
+        UserProfile profile = profileOpt.orElse(null);
 
-        UserProfile profile = profileOpt.get();
-        List<Scholarship> list = scholarshipRepository.findByCountry(profile.getCountry());
+        List<Scholarship> list;
+        if (profile != null && profile.getCountry() != null) {
+            list = scholarshipRepository.findByCountry(profile.getCountry());
+            if (list.isEmpty()) {
+                list = scholarshipRepository.findAll();
+            }
+        } else {
+            list = scholarshipRepository.findAll();
+        }
+
         List<UserScholarshipBookmark> bookmarks = bookmarkRepository.findByUserIdOrderByCreatedAtDesc(userId);
-
         List<ScholarshipCardDto> results = new ArrayList<>();
 
         for (Scholarship s : list) {
@@ -52,13 +59,16 @@ public class ScholarshipService {
             String status = bk.map(UserScholarshipBookmark::getStatus).orElse("NOT_BOOKMARKED");
 
             boolean eligible = true;
-            String reason = "Matches country citizenship and academic criteria.";
+            String reason = "Matches country citizenship and educational requirements.";
 
-            if (s.getEducationLevel() != null && profile.getEducationLevel() != null) {
-                if (!s.getEducationLevel().equalsIgnoreCase(profile.getEducationLevel()) 
-                    && !s.getEducationLevel().contains(profile.getEducationLevel())) {
-                    eligible = false;
-                    reason = "Education level specifies " + s.getEducationLevel();
+            if (profile != null) {
+                if (s.getEducationLevel() != null && profile.getEducationLevel() != null) {
+                    if (!s.getEducationLevel().equalsIgnoreCase(profile.getEducationLevel()) 
+                        && !s.getEducationLevel().contains(profile.getEducationLevel())
+                        && !s.getEducationLevel().equalsIgnoreCase("ALL")) {
+                        eligible = false;
+                        reason = "Scheme requires education level: " + s.getEducationLevel();
+                    }
                 }
             }
 

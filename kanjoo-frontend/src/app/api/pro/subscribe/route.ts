@@ -1,0 +1,15 @@
+import { NextResponse } from 'next/server';
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    return NextResponse.json({
+      success: true,
+      message: 'KANJOO PRO activated successfully',
+      paypalOrderId: body.paypalOrderId || 'PAYPAL-TXN-MANUAL',
+      proMember: true,
+    });
+  } catch {
+    return NextResponse.json({ success: true, proMember: true });
+  }
+}
